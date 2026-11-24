@@ -109,6 +109,23 @@ flowchart LR
 
 ---
 
+## Controle de VMs locais (vm-control)
+
+O MCP **`vm-control`** opera as VMs libvirt/QEMU de um host: `vm_list`, `vm_exec`, `vm_screenshot`, `vm_power` e `vm_snapshot`. O `vm_exec` roda **dentro** do guest pelo **QEMU guest agent** (canal serial virtio, como root no Linux e SYSTEM no Windows), então funciona mesmo sem rede, com rota errada ou VPN caída; `screenshot`, `power` e `snapshot` agem de fora, no hypervisor.
+
+Qualquer cliente em qualquer host controla as VMs de um host remoto registrando o MCP por **SSH stdio** — o agente raciocina localmente e o MCP executa no host das VMs:
+
+```json
+"vm-control": {
+  "command": "ssh",
+  "args": ["-o", "BatchMode=yes", "<host-vm>", "/home/<user>/.local/bin/vm-control-mcp"]
+}
+```
+
+Exemplo: um agente Claude Code no Mac controla os guests do host Linux via `ssh <host> vm-control-mcp` — o host das VMs é o hop que delega e o guest agent roda o comando dentro do guest. Para uma sessão interativa ou um agente de longa duração dentro do guest, use SSH direto no guest.
+
+---
+
 ## Mapa dos Repositórios
 
 ### 1. Repositórios Privados na Organização (`ai-harness-labs`)
